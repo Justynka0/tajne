@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextBus Admin Panel</title>
+    <title>NextBus Admin - GitHub Auto Deploy</title>
     <style>
         * {
             margin: 0;
@@ -62,6 +62,97 @@
             font-size: 14px;
         }
 
+        .setup-card {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .setup-card.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .setup-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setup-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .setup-content ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .setup-content li {
+            margin-bottom: 8px;
+        }
+
+        .setup-content code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .setup-content a {
+            color: #60A5FA;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .setup-content a:hover {
+            text-decoration: underline;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #E5E7EB;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #3B82F6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
         .current-version-card {
             background: rgba(59, 130, 246, 0.1);
             border: 1px solid rgba(59, 130, 246, 0.3);
@@ -83,12 +174,6 @@
             font-size: 36px;
             font-weight: 700;
             color: #60A5FA;
-        }
-
-        .last-update {
-            font-size: 12px;
-            color: #6B7280;
-            margin-top: 5px;
         }
 
         .tabs {
@@ -121,14 +206,6 @@
             box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-        }
-
         .tab-content {
             display: none;
         }
@@ -143,35 +220,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #E5E7EB;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px 16px;
-            color: white;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #3B82F6;
-            background: rgba(59, 130, 246, 0.1);
-        }
-
         .file-upload-area {
             width: 100%;
             padding: 40px;
@@ -181,7 +229,6 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
         }
 
         .file-upload-area:hover {
@@ -198,16 +245,6 @@
             display: none;
         }
 
-        .file-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        .file-text {
-            color: #9CA3AF;
-            font-size: 14px;
-        }
-
         .selected-file {
             background: rgba(59, 130, 246, 0.1);
             border: 1px solid rgba(59, 130, 246, 0.3);
@@ -215,27 +252,12 @@
             padding: 15px;
             margin-top: 15px;
             display: none;
-        }
-
-        .selected-file.visible {
-            display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .file-details {
-            flex: 1;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .file-size {
-            font-size: 12px;
-            color: #9CA3AF;
+        .selected-file.visible {
+            display: flex;
         }
 
         .btn {
@@ -256,26 +278,21 @@
             gap: 10px;
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
-        }
-
-        .btn:active {
-            transform: translateY(0);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
         .btn.success {
             background: linear-gradient(135deg, #10B981, #059669);
         }
 
-        .btn.success:hover {
+        .btn.success:hover:not(:disabled) {
             box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
         }
 
@@ -284,7 +301,6 @@
             border-radius: 12px;
             margin-top: 15px;
             font-size: 14px;
-            font-weight: 500;
             display: none;
             animation: slideIn 0.3s ease;
         }
@@ -298,55 +314,14 @@
             background: rgba(16, 185, 129, 0.2);
             border: 1px solid rgba(16, 185, 129, 0.3);
             color: #6EE7B7;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: block;
         }
 
         .status-message.error {
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid rgba(239, 68, 68, 0.3);
             color: #FCA5A5;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-box {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .info-title {
-            font-weight: 700;
-            color: #FCD34D;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .info-text {
-            font-size: 13px;
-            color: #FDE68A;
-            line-height: 1.6;
-        }
-
-        .info-text ul {
-            margin-top: 10px;
-            padding-left: 20px;
-        }
-
-        .info-text li {
-            margin-bottom: 5px;
-        }
-
-        .info-text code {
-            background: rgba(245, 158, 11, 0.2);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
+            display: block;
         }
 
         .spinner {
@@ -363,57 +338,116 @@
             100% { transform: rotate(360deg); }
         }
 
-        .download-link {
+        .info-box {
             background: rgba(59, 130, 246, 0.1);
             border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 12px;
             padding: 15px;
             margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
-        .download-link a {
-            color: #60A5FA;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
         }
 
-        .download-link a:hover {
-            color: #93C5FD;
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6, #60A5FA);
+            width: 0%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">⚙️</div>
-            <h1>Panel Administracyjny NextBus</h1>
-            <p class="subtitle">Zarządzaj wersjami i aktualizacjami aplikacji</p>
+            <div class="logo">🚀</div>
+            <h1>Panel Administracyjny - Auto Deploy</h1>
+            <p class="subtitle">System automatycznie zapisuje zmiany na GitHub i deployuje na Netlify</p>
         </div>
 
+        <!-- Setup Card -->
+        <div class="setup-card" id="setupCard">
+            <div class="setup-title">
+                <span>⚙️</span>
+                <span>Konfiguracja GitHub (jednorazowa)</span>
+            </div>
+            <div class="setup-content">
+                <p><strong>Aby system działał automatycznie, potrzebujesz:</strong></p>
+                <ol>
+                    <li>Konta GitHub (za darmo)</li>
+                    <li>Repozytorium z twoimi plikami</li>
+                    <li>Personal Access Token (wygenerujesz poniżej)</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>Jak uzyskać token:</strong></p>
+                <ol>
+                    <li>Wejdź na <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Tokens</a></li>
+                    <li>Kliknij "Generate new token (classic)"</li>
+                    <li>Zaznacz opcje: <code>repo</code> (wszystkie)</li>
+                    <li>Skopiuj wygenerowany token i wklej poniżej</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- GitHub Config -->
+        <div class="card">
+            <h2 style="margin-bottom: 20px; font-size: 20px;">🔐 Ustawienia GitHub</h2>
+            
+            <div class="form-group">
+                <label>GitHub Username</label>
+                <input type="text" id="githubUser" placeholder="np. twoja-nazwa">
+            </div>
+
+            <div class="form-group">
+                <label>Nazwa Repozytorium</label>
+                <input type="text" id="githubRepo" placeholder="np. nextbus-app">
+            </div>
+
+            <div class="form-group">
+                <label>Personal Access Token</label>
+                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxx">
+            </div>
+
+            <button class="btn" onclick="saveGithubConfig()">
+                💾 Zapisz konfigurację (zapisuje się lokalnie w przeglądarce)
+            </button>
+
+            <div class="status-message" id="statusGithub"></div>
+        </div>
+
+        <!-- Current Version -->
         <div class="current-version-card">
             <div class="version-info">
                 <h3>Aktualna wersja w systemie</h3>
                 <div class="version-number" id="currentVersion">Ładowanie...</div>
-                <div class="last-update" id="lastUpdate"></div>
             </div>
             <div style="font-size: 48px; opacity: 0.3;">📦</div>
         </div>
 
+        <!-- Tabs -->
         <div class="tabs">
             <div class="tab active" onclick="switchTab('config')">
-                ⚙️ Konfiguracja wersji
+                ⚙️ Aktualizuj wersję
             </div>
             <div class="tab" onclick="switchTab('upload')">
                 📦 Upload APK
             </div>
         </div>
 
+        <!-- Tab 1: Config -->
         <div class="card">
-            <!-- Tab 1: Konfiguracja -->
             <div class="tab-content active" id="config">
                 <div class="form-group">
                     <label>🔢 Najnowsza wersja</label>
@@ -425,34 +459,33 @@
                     <input type="text" id="minVersion" placeholder="1.0.0-beta">
                 </div>
 
-                <div class="form-group">
-                    <label>🔗 Link do pobrania (opcjonalnie)</label>
-                    <input type="text" id="downloadUrl" placeholder="Zostaw puste - wygeneruje się automatycznie">
-                </div>
-
-                <button class="btn" onclick="saveConfig()">
-                    💾 Zapisz i pobierz version.json
+                <button class="btn" onclick="updateVersion()" id="updateBtn">
+                    🚀 Zapisz na GitHub i deploy automatycznie
                 </button>
 
+                <div class="progress-bar" id="progressVersion">
+                    <div class="progress-fill" id="progressFillVersion"></div>
+                </div>
+
                 <div class="info-box">
-                    <div class="info-title">📋 Instrukcja:</div>
-                    <div class="info-text">
-                        <strong>1.</strong> Wypełnij pola powyżej<br>
-                        <strong>2.</strong> Kliknij "Zapisz" - plik <code>version.json</code> pobierze się automatycznie<br>
-                        <strong>3.</strong> Wgraj pobrany plik na Netlify (przeciągnij do zakładki "Deploys")
-                    </div>
+                    <strong>💡 Jak to działa:</strong><br>
+                    1. Wypełniasz pola powyżej<br>
+                    2. Klikasz "Zapisz" - system automatycznie:<br>
+                    &nbsp;&nbsp;&nbsp;✅ Aktualizuje version.json na GitHub<br>
+                    &nbsp;&nbsp;&nbsp;✅ Netlify automatycznie wdraża zmiany (2-3 min)<br>
+                    &nbsp;&nbsp;&nbsp;✅ Użytkownicy widzą nową wersję
                 </div>
 
                 <div class="status-message" id="statusConfig"></div>
             </div>
 
-            <!-- Tab 2: Upload APK -->
+            <!-- Tab 2: Upload -->
             <div class="tab-content" id="upload">
                 <div class="form-group">
-                    <label>📦 Wybierz plik APK do wgrania</label>
+                    <label>📦 Wybierz plik APK</label>
                     <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('apkFile').click()">
-                        <div class="file-icon">📁</div>
-                        <div class="file-text">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
+                        <div style="color: #9CA3AF;">
                             <strong>Kliknij aby wybrać plik</strong><br>
                             lub przeciągnij tu plik APK
                         </div>
@@ -461,54 +494,75 @@
                     
                     <div class="selected-file" id="selectedFile">
                         <div style="font-size: 32px;">📦</div>
-                        <div class="file-details">
-                            <div class="file-name" id="fileName"></div>
-                            <div class="file-size" id="fileSize"></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 4px;" id="fileName"></div>
+                            <div style="font-size: 12px; color: #9CA3AF;" id="fileSize"></div>
                         </div>
-                        <button onclick="clearFile()" style="background: rgba(239, 68, 68, 0.2); border: none; color: #FCA5A5; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                            ✕ Usuń
-                        </button>
                     </div>
                 </div>
 
                 <button class="btn success" onclick="uploadAPK()" id="uploadBtn">
-                    ⬆️ Wgraj APK na serwer
+                    ⬆️ Wgraj APK na GitHub (automatyczny deploy)
                 </button>
 
+                <div class="progress-bar" id="progressUpload">
+                    <div class="progress-fill" id="progressFillUpload"></div>
+                </div>
+
                 <div class="info-box">
-                    <div class="info-title">💡 Jak to działa:</div>
-                    <div class="info-text">
-                        <ul>
-                            <li>Wybierasz plik APK (np. <code>app-release.apk</code>)</li>
-                            <li>System zmienia nazwę na <code>nextbus.apk</code> i zapisuje</li>
-                            <li>Stara wersja zostaje automatycznie nadpisana</li>
-                            <li>Plik <code>version.json</code> aktualizuje się automatycznie</li>
-                            <li>Wszyscy użytkownicy pobierają zawsze najnowszą wersję</li>
-                        </ul>
-                        <br>
-                        <strong>⚠️ W tej wersji musisz wgrać APK ręcznie na Netlify</strong><br>
-                        (przeciągnij plik do zakładki "Deploys" i nazwij go <code>nextbus.apk</code>)
-                    </div>
+                    <strong>🎯 Pełna automatyzacja:</strong><br>
+                    1. Wybierasz plik APK (np. app-release.apk)<br>
+                    2. Klikasz "Wgraj" - system automatycznie:<br>
+                    &nbsp;&nbsp;&nbsp;✅ Wgrywa APK na GitHub jako "nextbus.apk"<br>
+                    &nbsp;&nbsp;&nbsp;✅ Nadpisuje starą wersję<br>
+                    &nbsp;&nbsp;&nbsp;✅ Aktualizuje version.json<br>
+                    &nbsp;&nbsp;&nbsp;✅ Netlify automatycznie deployuje (2-3 min)<br>
+                    &nbsp;&nbsp;&nbsp;✅ Użytkownicy pobierają nową wersję
                 </div>
 
                 <div class="status-message" id="statusUpload"></div>
             </div>
         </div>
-
-        <div class="download-link">
-            <div>
-                <strong>🌐 Strona pobierania dla użytkowników:</strong><br>
-                <span style="color: #9CA3AF; font-size: 13px;">Użytkownicy wchodzą tutaj aby pobrać aplikację</span>
-            </div>
-            <a href="./download.html" target="_blank">Otwórz stronę →</a>
-        </div>
     </div>
 
     <script>
+        let githubConfig = null;
         let selectedAPK = null;
 
-        // Wczytaj aktualną konfigurację
-        async function loadCurrentConfig() {
+        // Załaduj konfigurację z localStorage
+        function loadGithubConfig() {
+            const saved = localStorage.getItem('githubConfig');
+            if (saved) {
+                githubConfig = JSON.parse(saved);
+                document.getElementById('githubUser').value = githubConfig.user;
+                document.getElementById('githubRepo').value = githubConfig.repo;
+                document.getElementById('githubToken').value = githubConfig.token;
+                document.getElementById('setupCard').classList.add('success');
+                document.getElementById('setupCard').querySelector('.setup-title span:first-child').textContent = '✅';
+            }
+        }
+
+        // Zapisz konfigurację GitHub
+        function saveGithubConfig() {
+            const user = document.getElementById('githubUser').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+
+            if (!user || !repo || !token) {
+                showStatus('statusGithub', '❌ Wypełnij wszystkie pola', 'error');
+                return;
+            }
+
+            githubConfig = { user, repo, token };
+            localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
+            
+            document.getElementById('setupCard').classList.add('success');
+            document.getElementById('setupCard').querySelector('.setup-title span:first-child').textContent = '✅';
+            showStatus('statusGithub', '✅ Konfiguracja zapisana! Teraz możesz używać systemu', 'success');
+        }
+
+        // Wczytaj aktualną wersję
+        async function loadCurrentVersion() {
             try {
                 const response = await fetch('./version.json');
                 const data = await response.json();
@@ -516,18 +570,216 @@
                 document.getElementById('currentVersion').textContent = data.latest_version;
                 document.getElementById('latestVersion').value = data.latest_version;
                 document.getElementById('minVersion').value = data.min_required_version;
-                document.getElementById('downloadUrl').value = data.download_url || '';
-                
-                if (data.last_updated) {
-                    const date = new Date(data.last_updated);
-                    document.getElementById('lastUpdate').textContent = 
-                        `Ostatnia aktualizacja: ${date.toLocaleString('pl-PL')}`;
-                }
             } catch (error) {
-                document.getElementById('currentVersion').textContent = 'Brak danych';
-                showStatus('statusConfig', '❌ Nie można wczytać aktualnej konfiguracji', 'error');
+                document.getElementById('currentVersion').textContent = '---';
             }
         }
+
+        // Zaktualizuj wersję na GitHub
+        async function updateVersion() {
+            if (!githubConfig) {
+                showStatus('statusConfig', '❌ Najpierw skonfiguruj GitHub powyżej', 'error');
+                return;
+            }
+
+            const latest = document.getElementById('latestVersion').value.trim();
+            const min = document.getElementById('minVersion').value.trim();
+
+            if (!/^\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$/.test(latest)) {
+                showStatus('statusConfig', '❌ Nieprawidłowy format wersji', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('updateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> Zapisywanie na GitHub...';
+            
+            showProgress('progressVersion', 30);
+
+            const versionData = {
+                latest_version: latest,
+                min_required_version: min,
+                download_url: `https://${githubConfig.user}.github.io/${githubConfig.repo}/nextbus.apk`,
+                last_updated: new Date().toISOString()
+            };
+
+            try {
+                // GitHub API - aktualizuj version.json
+                const response = await fetch(
+                    `https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/version.json`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${githubConfig.token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `Update version to ${latest}`,
+                            content: btoa(JSON.stringify(versionData, null, 2)),
+                            sha: await getFileSHA('version.json')
+                        })
+                    }
+                );
+
+                showProgress('progressVersion', 100);
+
+                if (response.ok) {
+                    btn.innerHTML = '✅ Zapisano na GitHub!';
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = '🚀 Zapisz na GitHub i deploy automatycznie';
+                    }, 3000);
+                    
+                    showStatus('statusConfig', 
+                        '✅ Sukces! version.json zaktualizowany na GitHub<br><br>' +
+                        '⏳ Netlify automatycznie wdroży zmiany za ~2-3 minuty<br>' +
+                        '🔄 Możesz sprawdzić status na Netlify Dashboard', 
+                        'success'
+                    );
+                } else {
+                    throw new Error('GitHub API error');
+                }
+            } catch (error) {
+                showStatus('statusConfig', '❌ Błąd: ' + error.message + '<br>Sprawdź czy token jest prawidłowy', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Zapisz na GitHub i deploy automatycznie';
+            }
+
+            hideProgress('progressVersion');
+        }
+
+        // Pobierz SHA pliku (potrzebne do aktualizacji)
+        async function getFileSHA(filename) {
+            try {
+                const response = await fetch(
+                    `https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/${filename}`,
+                    {
+                        headers: { 'Authorization': `token ${githubConfig.token}` }
+                    }
+                );
+                const data = await response.json();
+                return data.sha;
+            } catch {
+                return null;
+            }
+        }
+
+        // Upload APK na GitHub
+        async function uploadAPK() {
+            if (!githubConfig) {
+                showStatus('statusUpload', '❌ Najpierw skonfiguruj GitHub', 'error');
+                return;
+            }
+
+            if (!selectedAPK) {
+                showStatus('statusUpload', '❌ Najpierw wybierz plik APK', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> Wgrywanie na GitHub...';
+            
+            showProgress('progressUpload', 20);
+
+            try {
+                // Konwertuj plik do Base64
+                const base64 = await fileToBase64(selectedAPK);
+                showProgress('progressUpload', 50);
+
+                // Wgraj na GitHub jako nextbus.apk
+                const response = await fetch(
+                    `https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/nextbus.apk`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${githubConfig.token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `Upload APK: ${selectedAPK.name}`,
+                            content: base64,
+                            sha: await getFileSHA('nextbus.apk')
+                        })
+                    }
+                );
+
+                showProgress('progressUpload', 100);
+
+                if (response.ok) {
+                    btn.innerHTML = '✅ APK wgrany!';
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = '⬆️ Wgraj APK na GitHub (automatyczny deploy)';
+                    }, 3000);
+                    
+                    showStatus('statusUpload', 
+                        '✅ Sukces! APK wgrany na GitHub jako nextbus.apk<br><br>' +
+                        '⏳ Netlify automatycznie wdroży plik za ~2-3 minuty<br>' +
+                        '📱 Użytkownicy będą pobierać nową wersję!', 
+                        'success'
+                    );
+                    
+                    selectedAPK = null;
+                    document.getElementById('selectedFile').classList.remove('visible');
+                } else {
+                    throw new Error('GitHub upload failed');
+                }
+            } catch (error) {
+                showStatus('statusUpload', '❌ Błąd wgrywania: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '⬆️ Wgraj APK na GitHub (automatyczny deploy)';
+            }
+
+            hideProgress('progressUpload');
+        }
+
+        // Konwertuj plik do Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Obsługa wyboru pliku
+        document.getElementById('apkFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.name.endsWith('.apk')) {
+                selectedAPK = file;
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileSize').textContent = `${sizeMB} MB`;
+                document.getElementById('selectedFile').classList.add('visible');
+            }
+        });
+
+        // Drag & Drop
+        const uploadArea = document.getElementById('fileUploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.apk')) {
+                selectedAPK = file;
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileSize').textContent = `${sizeMB} MB`;
+                document.getElementById('selectedFile').classList.add('visible');
+            }
+        });
 
         // Zmiana zakładki
         function switchTab(tabName) {
@@ -538,160 +790,14 @@
             document.getElementById(tabName).classList.add('active');
         }
 
-        // Walidacja wersji
-        function isValidVersion(version) {
-            return /^\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$/.test(version);
-        }
-
-        // Zapisz konfigurację
-        function saveConfig() {
-            const latest = document.getElementById('latestVersion').value.trim();
-            const min = document.getElementById('minVersion').value.trim();
-            let downloadUrl = document.getElementById('downloadUrl').value.trim();
-
-            if (!isValidVersion(latest)) {
-                showStatus('statusConfig', '❌ Nieprawidłowy format wersji (użyj: 1.0.0 lub 1.0.0-beta)', 'error');
-                return;
-            }
-
-            if (!isValidVersion(min)) {
-                showStatus('statusConfig', '❌ Nieprawidłowy format minimalnej wersji', 'error');
-                return;
-            }
-
-            if (!downloadUrl) {
-                downloadUrl = window.location.origin + '/nextbus.apk';
-            }
-
-            const versionData = {
-                latest_version: latest,
-                min_required_version: min,
-                download_url: downloadUrl,
-                last_updated: new Date().toISOString()
-            };
-
-            const jsonString = JSON.stringify(versionData, null, 2);
-
-            // Pobierz jako plik
-            downloadJSON(jsonString, 'version.json');
-            
-            // Skopiuj do schowka
-            navigator.clipboard.writeText(jsonString).then(() => {
-                showStatus('statusConfig', '✅ Plik version.json został pobrany! Teraz wgraj go na Netlify', 'success');
-            }).catch(() => {
-                showStatus('statusConfig', '✅ Plik version.json został pobrany!', 'success');
-            });
-
-            console.log('Nowy version.json:', jsonString);
-        }
-
-        // Pobierz JSON jako plik
-        function downloadJSON(content, filename) {
-            const blob = new Blob([content], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        // Obsługa wyboru pliku
-        document.getElementById('apkFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file && file.name.endsWith('.apk')) {
-                selectedAPK = file;
-                showFileInfo(file);
-            } else {
-                showStatus('statusUpload', '❌ Wybierz prawidłowy plik APK', 'error');
-            }
-        });
-
-        // Pokaż info o pliku
-        function showFileInfo(file) {
-            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileSize').textContent = `${sizeMB} MB`;
-            document.getElementById('selectedFile').classList.add('visible');
-        }
-
-        // Wyczyść wybór pliku
-        function clearFile() {
-            selectedAPK = null;
-            document.getElementById('apkFile').value = '';
-            document.getElementById('selectedFile').classList.remove('visible');
-        }
-
-        // Drag & Drop
-        const uploadArea = document.getElementById('fileUploadArea');
-
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            
-            const file = e.dataTransfer.files[0];
-            if (file && file.name.endsWith('.apk')) {
-                selectedAPK = file;
-                showFileInfo(file);
-                document.getElementById('apkFile').files = e.dataTransfer.files;
-            } else {
-                showStatus('statusUpload', '❌ Przeciągnij prawidłowy plik APK', 'error');
-            }
-        });
-
-        // Upload APK (instrukcja)
-        function uploadAPK() {
-            if (!selectedAPK) {
-                showStatus('statusUpload', '❌ Najpierw wybierz plik APK', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('uploadBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner"></div> Przygotowywanie...';
-
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = '⬆️ Wgraj APK na serwer';
-                
-                showStatus('statusUpload', 
-                    `✅ Plik ${selectedAPK.name} został przygotowany!<br><br>` +
-                    `<strong>Teraz wykonaj:</strong><br>` +
-                    `1. Wejdź na Netlify Dashboard<br>` +
-                    `2. Kliknij "Deploys" → "Upload Folder"<br>` +
-                    `3. Przeciągnij plik i zmień nazwę na <code style="background: rgba(16, 185, 129, 0.2); padding: 2px 6px; border-radius: 4px;">nextbus.apk</code><br>` +
-                    `4. System automatycznie nadpisze starą wersję!`, 
-                    'success'
-                );
-            }, 1500);
-        }
-
         // Pokaż status
         function showStatus(elementId, message, type) {
             const statusEl = document.getElementById(elementId);
             statusEl.innerHTML = message;
             statusEl.className = `status-message ${type}`;
-            
-            setTimeout(() => {
-                if (type === 'error') {
-                    statusEl.style.display = 'none';
-                }
-            }, 8000);
         }
 
-        // Załaduj na start
-        window.addEventListener('load', loadCurrentConfig);
-    </script>
-</body>
-</html>
+        // Progress bar
+        function showProgress(id, percent) {
+            document.getElementById(id).classList.add('active');
+            document.getElementById(id + 'Fill').style.width = percent
