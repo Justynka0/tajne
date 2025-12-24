@@ -1,443 +1,374 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextBus Admin</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+import React, { useState, useEffect } from 'react';
+import { Upload, Download, AlertCircle, CheckCircle, Loader, Package, Settings } from 'lucide-react';
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-            color: white;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
+const AdminSystem = () => {
+  const [currentConfig, setCurrentConfig] = useState(null);
+  const [latestVersion, setLatestVersion] = useState('');
+  const [minVersion, setMinVersion] = useState('');
+  const [downloadUrl, setDownloadUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [status, setStatus] = useState({ message: '', type: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('config');
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
+  // Załaduj aktualną konfigurację
+  useEffect(() => {
+    loadCurrentConfig();
+  }, []);
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+  const loadCurrentConfig = async () => {
+    try {
+      const response = await fetch('/version.json');
+      const data = await response.json();
+      setCurrentConfig(data);
+      setLatestVersion(data.latest_version);
+      setMinVersion(data.min_required_version);
+      setDownloadUrl(data.download_url || '');
+    } catch (error) {
+      showStatus('Nie można załadować aktualnej konfiguracji', 'error');
+    }
+  };
 
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #EF4444, #DC2626);
-            border-radius: 20px;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
+  const showStatus = (message, type) => {
+    setStatus({ message, type });
+    setTimeout(() => setStatus({ message: '', type: '' }), 5000);
+  };
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #EF4444, #F87171);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+  const isValidVersion = (version) => {
+    return /^\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$/.test(version);
+  };
 
-        .subtitle {
-            color: #9CA3AF;
-            font-size: 14px;
-        }
+  // Zapisz konfigurację (version.json)
+  const saveConfiguration = async () => {
+    if (!isValidVersion(latestVersion)) {
+      showStatus('❌ Nieprawidłowy format wersji (użyj: 1.0.0 lub 1.0.0-beta)', 'error');
+      return;
+    }
 
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-        }
+    if (!isValidVersion(minVersion)) {
+      showStatus('❌ Nieprawidłowy format minimalnej wersji', 'error');
+      return;
+    }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    setIsLoading(true);
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #E5E7EB;
-        }
+    const newConfig = {
+      latest_version: latestVersion,
+      min_required_version: minVersion,
+      download_url: downloadUrl || `${window.location.origin}/nextbus.apk`,
+      last_updated: new Date().toISOString()
+    };
 
-        input[type="text"] {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px 16px;
-            color: white;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
+    try {
+      // W prawdziwym środowisku to by wywołało Netlify Function
+      // która zapisuje plik na serwerze
+      const response = await fetch('/.netlify/functions/update-version', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newConfig)
+      });
 
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #3B82F6;
-            background: rgba(59, 130, 246, 0.1);
-        }
+      if (response.ok) {
+        setCurrentConfig(newConfig);
+        showStatus('✅ Konfiguracja zapisana pomyślnie!', 'success');
+        
+        // Pobierz plik jako backup
+        const blob = new Blob([JSON.stringify(newConfig, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'version.json';
+        link.click();
+        URL.revokeObjectURL(url);
+      } else {
+        throw new Error('Błąd zapisu');
+      }
+    } catch (error) {
+      showStatus('⚠️ Symulacja: JSON wygenerowany (pobierz i wgraj ręcznie)', 'error');
+      
+      // Fallback - pobierz plik
+      const blob = new Blob([JSON.stringify(newConfig, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'version.json';
+      link.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+  // Upload APK
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.name.endsWith('.apk')) {
+      setSelectedFile(file);
+      showStatus(`📦 Wybrano: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`, 'success');
+    } else {
+      showStatus('❌ Wybierz prawidłowy plik APK', 'error');
+      setSelectedFile(null);
+    }
+  };
 
-        input[type="file"]:hover {
-            border-color: #3B82F6;
-            background: rgba(59, 130, 246, 0.1);
-        }
+  const uploadAPK = async () => {
+    if (!selectedFile) {
+      showStatus('❌ Najpierw wybierz plik APK', 'error');
+      return;
+    }
 
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #3B82F6, #2563EB);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
+    setIsLoading(true);
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
-        }
+    try {
+      const formData = new FormData();
+      formData.append('apk', selectedFile);
+      formData.append('version', latestVersion);
 
-        .btn:active {
-            transform: translateY(0);
-        }
+      // W prawdziwym środowisku - upload do Netlify
+      const response = await fetch('/.netlify/functions/upload-apk', {
+        method: 'POST',
+        body: formData
+      });
 
-        .btn.danger {
-            background: linear-gradient(135deg, #EF4444, #DC2626);
-        }
+      if (response.ok) {
+        showStatus('✅ APK wgrane pomyślnie! Stara wersja została usunięta.', 'success');
+        setSelectedFile(null);
+        
+        // Automatycznie zaktualizuj version.json
+        await saveConfiguration();
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      showStatus('⚠️ Symulacja uploadu - w produkcji użyj Netlify Functions', 'error');
+      console.log('Plik do wgrania:', selectedFile.name, selectedFile.size);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        .btn.danger:hover {
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.5);
-        }
-
-        .current-version {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .current-version h3 {
-            font-size: 14px;
-            color: #9CA3AF;
-            margin-bottom: 5px;
-        }
-
-        .current-version .value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #60A5FA;
-        }
-
-        .status-message {
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-top: 15px;
-            font-size: 14px;
-            font-weight: 500;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .status-message.success {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #6EE7B7;
-            display: block;
-        }
-
-        .status-message.error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #FCA5A5;
-            display: block;
-        }
-
-        .divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 30px 0;
-        }
-
-        .warning {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-
-        .warning-icon {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .warning-text {
-            font-size: 13px;
-            color: #FCD34D;
-            line-height: 1.6;
-        }
-
-        .file-info {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 13px;
-            color: #9CA3AF;
-            display: none;
-        }
-
-        .file-info.visible {
-            display: block;
-        }
-
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid #3B82F6;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">🔐</div>
-            <h1>Panel Administracyjny</h1>
-            <p class="subtitle">Zarządzaj wersjami aplikacji NextBus</p>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-blue-500/50">
+            <Settings className="w-10 h-10" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-2">
+            Panel Administracyjny
+          </h1>
+          <p className="text-gray-400">Zarządzaj aktualizacjami aplikacji NextBus</p>
         </div>
 
-        <div class="card">
-            <div class="current-version">
-                <h3>Aktualna wersja w systemie</h3>
-                <div class="value" id="currentVersion">Ładowanie...</div>
+        {/* Current Version Card */}
+        {currentConfig && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-400 text-sm mb-1">Aktualna wersja w systemie</p>
+                <p className="text-3xl font-bold text-blue-400">{currentConfig.latest_version}</p>
+              </div>
+              <Package className="w-12 h-12 text-blue-400 opacity-50" />
             </div>
+            {currentConfig.last_updated && (
+              <p className="text-xs text-gray-500 mt-2">
+                Ostatnia aktualizacja: {new Date(currentConfig.last_updated).toLocaleString('pl-PL')}
+              </p>
+            )}
+          </div>
+        )}
 
-            <div class="form-group">
-                <label>🔢 Najnowsza wersja</label>
-                <input type="text" id="latestVersion" placeholder="1.0.0">
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('config')}
+            className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+              activeTab === 'config'
+                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/50'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            ⚙️ Konfiguracja
+          </button>
+          <button
+            onClick={() => setActiveTab('upload')}
+            className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+              activeTab === 'upload'
+                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/50'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            📦 Upload APK
+          </button>
+        </div>
+
+        {/* Main Card */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
+          {activeTab === 'config' ? (
+            // Configuration Tab
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-300">
+                  🔢 Najnowsza wersja
+                </label>
+                <input
+                  type="text"
+                  value={latestVersion}
+                  onChange={(e) => setLatestVersion(e.target.value)}
+                  placeholder="1.0.0"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-blue-500/10 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-300">
+                  ⚠️ Minimalna wymagana wersja
+                </label>
+                <input
+                  type="text"
+                  value={minVersion}
+                  onChange={(e) => setMinVersion(e.target.value)}
+                  placeholder="1.0.0"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-blue-500/10 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-300">
+                  🔗 Link do pobrania (opcjonalnie)
+                </label>
+                <input
+                  type="text"
+                  value={downloadUrl}
+                  onChange={(e) => setDownloadUrl(e.target.value)}
+                  placeholder="https://nextbus.netlify.app/nextbus.apk"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-blue-500/10 transition-all"
+                />
+              </div>
+
+              <button
+                onClick={saveConfiguration}
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-100 shadow-lg shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Zapisywanie...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Zapisz konfigurację
+                  </>
+                )}
+              </button>
             </div>
-
-            <div class="form-group">
-                <label>⚠️ Minimalna wymagana wersja</label>
-                <input type="text" id="minVersion" placeholder="1.0.0">
-            </div>
-
-            <div class="form-group">
-                <label>🔗 Link do pobrania (opcjonalnie)</label>
-                <input type="text" id="downloadUrl" placeholder="https://nextbus.netlify.app/nextbus.apk">
-            </div>
-
-            <button class="btn" onclick="updateVersion()">
-                💾 Zapisz konfigurację
-            </button>
-
-            <div class="divider"></div>
-
-            <div class="form-group">
-                <label>📦 Upload nowego APK</label>
-                <input type="file" id="apkFile" accept=".apk" onchange="showFileInfo()">
-                <div class="file-info" id="fileInfo"></div>
-            </div>
-
-            <button class="btn" onclick="uploadAPK()">
-                ⬆️ Wgraj APK
-            </button>
-
-            <div class="warning">
-                <div class="warning-icon">⚠️</div>
-                <div class="warning-text">
-                    <strong>UWAGA:</strong> Zmiany w version.json muszą być ręcznie wgrane na Netlify. 
-                    Ta strona służy tylko do generowania pliku JSON. Po kliknięciu "Zapisz", 
-                    skopiuj wygenerowany JSON i wklej go do pliku version.json w swoim projekcie.
+          ) : (
+            // Upload Tab
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold mb-3 text-gray-300">
+                  📦 Wybierz plik APK
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".apk"
+                    onChange={handleFileSelect}
+                    className="w-full bg-white/5 border-2 border-dashed border-white/20 rounded-xl px-4 py-8 text-white cursor-pointer hover:border-blue-500 hover:bg-blue-500/10 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 file:cursor-pointer"
+                  />
                 </div>
+                {selectedFile && (
+                  <div className="mt-3 bg-white/5 rounded-lg p-3 flex items-center gap-3">
+                    <Package className="w-5 h-5 text-blue-400" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-white">{selectedFile.name}</p>
+                      <p className="text-xs text-gray-400">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={uploadAPK}
+                disabled={isLoading || !selectedFile}
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 rounded-xl transition-all transform hover:scale-[1.02] active:scale-100 shadow-lg shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Wgrywanie...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-5 h-5" />
+                    Wgraj APK (auto-update version.json)
+                  </>
+                )}
+              </button>
+
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
+                <div className="flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-yellow-200">
+                    <p className="font-semibold mb-1">Jak to działa:</p>
+                    <ul className="space-y-1 text-yellow-300/80">
+                      <li>1. Wybierasz plik APK i wgrywasz</li>
+                      <li>2. System zapisuje go jako <code className="bg-yellow-500/20 px-1 rounded">nextbus.apk</code></li>
+                      <li>3. Stara wersja zostaje automatycznie usunięta</li>
+                      <li>4. Plik <code className="bg-yellow-500/20 px-1 rounded">version.json</code> aktualizuje się sam</li>
+                      <li>5. Użytkownicy pobierają zawsze najnowszą wersję</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
+          )}
 
-            <div class="status-message" id="statusMessage"></div>
+          {/* Status Message */}
+          {status.message && (
+            <div
+              className={`mt-6 p-4 rounded-xl flex items-center gap-3 animate-in slide-in-from-top ${
+                status.type === 'success'
+                  ? 'bg-green-500/10 border border-green-500/30 text-green-300'
+                  : 'bg-red-500/10 border border-red-500/30 text-red-300'
+              }`}
+            >
+              {status.type === 'success' ? (
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+              ) : (
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              )}
+              <p className="text-sm font-medium">{status.message}</p>
+            </div>
+          )}
         </div>
+
+        {/* Info Box */}
+        <div className="mt-6 bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+          <h3 className="font-semibold text-blue-300 mb-2 flex items-center gap-2">
+            <Download className="w-5 h-5" />
+            Strona pobierania dla użytkowników
+          </h3>
+          <p className="text-sm text-blue-200 mb-3">
+            Użytkownicy wchodzą na <code className="bg-blue-500/20 px-2 py-1 rounded">yoursite.com/download</code> i automatycznie pobierają najnowszy APK
+          </p>
+          <a
+            href="/download"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            Podgląd strony pobierania →
+          </a>
+        </div>
+      </div>
     </div>
+  );
+};
 
-    <script>
-        // Wczytaj aktualną wersję
-        async function loadCurrentVersion() {
-            try {
-                const response = await fetch('./version.json');
-                const data = await response.json();
-                
-                document.getElementById('currentVersion').textContent = data.latest_version;
-                document.getElementById('latestVersion').value = data.latest_version;
-                document.getElementById('minVersion').value = data.min_required_version;
-                document.getElementById('downloadUrl').value = data.download_url || '';
-            } catch (error) {
-                document.getElementById('currentVersion').textContent = 'Błąd ładowania';
-                showStatus('Nie można wczytać aktualnej wersji', 'error');
-            }
-        }
-
-        // Walidacja formatu wersji
-        function isValidVersion(version) {
-            const regex = /^\d+\.\d+\.\d+$/;
-            return regex.test(version);
-        }
-
-        // Aktualizuj wersję (generuj JSON)
-        function updateVersion() {
-            const latest = document.getElementById('latestVersion').value.trim();
-            const min = document.getElementById('minVersion').value.trim();
-            let downloadUrl = document.getElementById('downloadUrl').value.trim();
-
-            // Walidacja
-            if (!isValidVersion(latest)) {
-                showStatus('❌ Nieprawidłowy format najnowszej wersji (użyj formatu: 1.0.0)', 'error');
-                return;
-            }
-
-            if (!isValidVersion(min)) {
-                showStatus('❌ Nieprawidłowy format minimalnej wersji (użyj formatu: 1.0.0)', 'error');
-                return;
-            }
-
-            // Domyślny URL jeśli pusty
-            if (!downloadUrl) {
-                downloadUrl = window.location.origin + '/nextbus.apk';
-            }
-
-            // Generuj JSON
-            const versionData = {
-                latest_version: latest,
-                min_required_version: min,
-                download_url: downloadUrl
-            };
-
-            const jsonString = JSON.stringify(versionData, null, 2);
-
-            // Skopiuj do schowka
-            navigator.clipboard.writeText(jsonString).then(() => {
-                showStatus('✅ JSON skopiowany do schowka! Wklej go do pliku version.json', 'success');
-                
-                // Pokaż JSON w konsoli
-                console.log('Nowy version.json:', jsonString);
-                
-                // Pobierz jako plik
-                downloadJSON(jsonString, 'version.json');
-            }).catch(() => {
-                showStatus('⚠️ Nie można skopiować. Sprawdź konsolę przeglądarki.', 'error');
-                console.log('JSON do skopiowania:', jsonString);
-            });
-        }
-
-        // Pobierz JSON jako plik
-        function downloadJSON(content, filename) {
-            const blob = new Blob([content], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        // Pokaż info o pliku
-        function showFileInfo() {
-            const fileInput = document.getElementById('apkFile');
-            const fileInfo = document.getElementById('fileInfo');
-            
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                fileInfo.textContent = `📄 ${file.name} (${sizeMB} MB)`;
-                fileInfo.classList.add('visible');
-            } else {
-                fileInfo.classList.remove('visible');
-            }
-        }
-
-        // Upload APK (symulacja)
-        function uploadAPK() {
-            const fileInput = document.getElementById('apkFile');
-            
-            if (fileInput.files.length === 0) {
-                showStatus('❌ Wybierz plik APK do wgrania', 'error');
-                return;
-            }
-
-            const file = fileInput.files[0];
-            
-            if (!file.name.endsWith('.apk')) {
-                showStatus('❌ Wybrany plik nie jest plikiem APK', 'error');
-                return;
-            }
-
-            // Symulacja uploadu
-            showStatus('⏳ Wgrywanie pliku...', 'success');
-            
-            setTimeout(() => {
-                showStatus('⚠️ Upload wymaga ręcznego wgrania przez Netlify Dashboard', 'error');
-                console.log('Plik do wgrania:', file.name, file.size);
-            }, 1500);
-        }
-
-        // Pokaż status
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.textContent = message;
-            statusEl.className = `status-message ${type}`;
-            
-            setTimeout(() => {
-                statusEl.style.display = 'none';
-            }, 5000);
-        }
-
-        // Załaduj na start
-        window.addEventListener('load', loadCurrentVersion);
-    </script>
-</body>
-</html>
+export default AdminSystem;
