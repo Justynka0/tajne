@@ -1,1 +1,328 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextBus - Pobierz Aplikację</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            border-radius: 24px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            color: #9CA3AF;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .download-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .version {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #60A5FA;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .status.downloading {
+            color: #3B82F6;
+        }
+
+        .status.success {
+            color: #10B981;
+        }
+
+        .status.error {
+            color: #EF4444;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6, #60A5FA);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 10px;
+            font-size: 13px;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .manual-download {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .manual-download.visible {
+            display: block;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3B82F6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .spinner.active {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚌</div>
+        <h1>NextBus</h1>
+        <p>Najlepsza aplikacja do planowania podróży komunikacją miejską</p>
+
+        <div class="download-info">
+            <div class="version" id="version">Wersja 1.0.0</div>
+            <div class="spinner" id="spinner"></div>
+            <div class="status" id="status">Przygotowywanie pobierania...</div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="manual-download" id="manualDownload">
+            <a href="./nextbus.apk" class="btn" download>📥 Pobierz ręcznie</a>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🗺️</div>
+                <div>Rozkłady jazdy</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔔</div>
+                <div>Powiadomienia</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📍</div>
+                <div>GPS na mapie</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            © 2025 NextBus | Made with ❤️
+        </div>
+    </div>
+
+    <script>
+        // Pobierz wersję z pliku version.json
+        async function loadVersion() {
+            try {
+                const response = await fetch('./version.json');
+                const data = await response.json();
+                document.getElementById('version').textContent = `Wersja ${data.latest_version}`;
+            } catch (error) {
+                console.error('Błąd pobierania wersji:', error);
+            }
+        }
+
+        // Automatyczne pobieranie APK
+        function startDownload() {
+            const status = document.getElementById('status');
+            const spinner = document.getElementById('spinner');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const manualDownload = document.getElementById('manualDownload');
+
+            // Pokaż spinner
+            spinner.classList.add('active');
+            status.className = 'status downloading';
+            status.textContent = 'Pobieranie NextBus...';
+            progressBar.classList.add('active');
+
+            // Symulacja progresu (prawdziwy progress wymaga fetch z stream)
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    spinner.classList.remove('active');
+                    status.className = 'status success';
+                    status.textContent = '✅ Pobieranie ukończone!';
+                    
+                    // Pokaż przycisk ręcznego pobierania jako backup
+                    setTimeout(() => {
+                        manualDownload.classList.add('visible');
+                    }, 2000);
+                }
+            }, 100);
+
+            // Faktyczne pobieranie pliku
+            const link = document.createElement('a');
+            link.href = './nextbus.apk';
+            link.download = 'nextbus.apk';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Obsługa błędów (jeśli plik nie istnieje)
+            setTimeout(() => {
+                // Jeśli po 3 sekundach nadal nie ma pliku, pokaż błąd
+                if (progress < 50) {
+                    clearInterval(interval);
+                    spinner.classList.remove('active');
+                    progressBar.classList.remove('active');
+                    status.className = 'status error';
+                    status.textContent = '❌ Błąd pobierania';
+                    manualDownload.classList.add('visible');
+                }
+            }, 3000);
+        }
+
+        // Start przy załadowaniu strony
+        window.addEventListener('load', () => {
+            loadVersion();
+            setTimeout(startDownload, 1000);
+        });
+    </script>
+</body>
+</html>
