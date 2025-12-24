@@ -801,3 +801,31 @@
         function showProgress(id, percent) {
             document.getElementById(id).classList.add('active');
             document.getElementById(id + 'Fill').style.width = percent
+            <function_calls>
+<invoke name="artifacts">
+<parameter name="command">update</parameter>
+<parameter name="id">nextbus_admin_system</parameter>
+<parameter name="old_str">        // Progress bar
+function showProgress(id, percent) {
+document.getElementById(id).classList.add('active');
+document.getElementById(id + 'Fill').style.width = percent</parameter>
+<parameter name="new_str">        // Progress bar
+function showProgress(id, percent) {
+document.getElementById(id).classList.add('active');
+document.getElementById(id + 'Fill').style.width = percent + '%';
+}
+    function hideProgress(id) {
+        setTimeout(() => {
+            document.getElementById(id).classList.remove('active');
+            document.getElementById(id + 'Fill').style.width = '0%';
+        }, 1000);
+    }
+
+    // Start
+    window.addEventListener('load', () => {
+        loadGithubConfig();
+        loadCurrentVersion();
+    });
+</script>
+</body>
+</html></parameter>
